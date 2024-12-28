@@ -1,0 +1,97 @@
+#XSS
+alert http any any -> any any (msg:"XSS detected - Script tag in payload"; content:"<script"; nocase; http_client_body; sid:100001; rev:1;)
+alert http any any -> any any (msg:"XSS detected - JavaScript URI"; content:"javascript:"; nocase; http_uri; sid:100002; rev:1;)
+alert http any any -> any any (msg:"XSS detected - Event handler injection"; pcre:"/on[a-z]+=/Ui"; http_client_body; sid:100003; rev:1;)
+alert http any any -> any any (msg:"XSS detected - img src injection"; content:"img src="; nocase; http_client_body; sid:100004; rev:1;)
+alert http any any -> any any (msg:"XSS detected - style injection"; content:"style="; nocase; http_client_body; sid:100005; rev:1;)
+alert http any any -> any any (msg:"XSS detected - iframe injection"; content:"<iframe"; nocase; http_client_body; sid:100006; rev:1;)
+alert http any any -> any any (msg:"XSS detected - alert payload"; content:"alert("; nocase; http_client_body; sid:100007; rev:1;)
+alert http any any -> any any (msg:"SQLi detected - Union Select"; pcre:"/\bunion\b.*\bselect\b/i"; http_uri; sid:200001; rev:1;)
+
+#SQLi
+alert http any any -> any any (msg:"SQLi detected - Comment Injection"; content:"--"; http_uri; sid:200002; rev:1;)
+alert http any any -> any any (msg:"SQLi detected - OR '1'='1'"; content:"'1'='1"; nocase; http_uri; sid:200003; rev:1;)
+alert http any any -> any any (msg:"SQLi detected - Sleep function"; content:"sleep("; nocase; http_uri; sid:200004; rev:1;)
+alert http any any -> any any (msg:"SQLi detected - Information schema access"; content:"information_schema"; nocase; http_uri; sid:200005; rev:1;)
+alert http any any -> any any (msg:"SQLi detected - Hexadecimal payload"; pcre:"/0x[0-9a-f]+/i"; http_uri; sid:200006; rev:1;)
+alert http any any -> any any (msg:"SQLi detected - Error-based payload"; content:"you have an error in your sql syntax"; nocase; http_client_body; sid:200007; rev:1;)
+
+#LFI
+alert http any any -> any any (msg:"LFI detected - Path traversal"; content:"../"; http_uri; sid:300001; rev:1;)
+alert http any any -> any any (msg:"LFI detected - /etc/passwd access"; content:"/etc/passwd"; nocase; http_uri; sid:300002; rev:1;)
+alert http any any -> any any (msg:"LFI detected - Null byte injection"; content:"%00"; nocase; http_uri; sid:300003; rev:1;)
+alert http any any -> any any (msg:"LFI detected - PHP wrapper"; content:"php://"; nocase; http_uri; sid:300004; rev:1;)
+alert http any any -> any any (msg:"LFI detected - File protocol"; content:"file://"; nocase; http_uri; sid:300005; rev:1;)
+alert http any any -> any any (msg:"LFI detected - Log file access"; content:"/var/log"; nocase; http_uri; sid:300006; rev:1;)
+alert http any any -> any any (msg:"LFI detected - Temporary file access"; content:"/tmp"; nocase; http_uri; sid:300007; rev:1;)
+
+#RCE
+alert http any any -> any any (msg:"RCE detected - Dangerous PHP function"; pcre:"/(system|exec|shell_exec|passthru|proc_open|popen|eval|assert)\(/i"; http_client_body; sid:400001; rev:1;)
+alert http any any -> any any (msg:"RCE detected - Command injection characters"; pcre:"/(\||;|&&|`|\$\(.*\))/"; http_uri; sid:400002; rev:1;)
+alert http any any -> any any (msg:"RCE detected - Interpreter access"; pcre:"/(\/bin\/bash|\/bin\/sh|\/usr\/bin\/perl|\/usr\/bin\/python)/i"; http_uri; sid:400003; rev:1;)
+alert http any any -> any any (msg:"RCE detected - Reverse shell attempt"; pcre:"/(nc\s+-e|bash\s+-i|sh\s+-i)/i"; http_client_body; sid:400004; rev:1;)
+alert http any any -> any any (msg:"RCE detected - Remote download tools"; pcre:"/(wget|curl|lwp-download)/i"; http_uri; sid:400005; rev:1;)
+alert http any any -> any any (msg:"RCE detected - Encoded payload"; pcre:"/eval\(base64_decode|eval\(unserialize/i"; http_client_body; sid:400006; rev:1;)
+alert http any any -> any any (msg:"RCE detected - Dangerous environment access"; content:"env:"; http_uri; sid:400007; rev:1;)
+
+
+
+
+#Rule modsecurity
+#SQL injection
+SecRule REQUEST_URI "@contains select" \
+    "id:1001,phase:2,log,deny,status:403,msg:'SQL Injection Detected'"
+SecRule ARGS "(?i:(union|select|insert|update|delete|drop|create|alter)\s+)" \
+    "id:200001,phase:2,deny,status:403,msg:'SQL Injection detected - basic SQL keywords',severity:2,t:none"
+SecRule ARGS "('|--|;|#)" \
+    "id:200002,phase:2,deny,status:403,msg:'SQL Injection detected - special characters',severity:2,t:none"
+SecRule ARGS "(?i:\bor\s+1=1\b)" \
+    "id:200003,phase:2,deny,status:403,msg:'SQL Injection detected - OR always true condition',severity:2,t:none"
+SecRule ARGS "(?i:\band\s+\d+=\d+\b)" \
+    "id:200004,phase:2,deny,status:403,msg:'SQL Injection detected - AND always true condition',severity:2,t:none"
+SecRule ARGS "(?i:--|#)" \
+    "id:200005,phase:2,deny,status:403,msg:'SQL Injection detected - SQL comments',severity:2,t:none"
+SecRule ARGS "(?i:(benchmark|sleep|load_file|outfile)\s*\()" \
+    "id:200006,phase:2,deny,status:403,msg:'SQL Injection detected - SQL function abuse',severity:2,t:none"
+SecRule ARGS "(?i:(\bselect\b.*?=.*?\bfrom\b))" \
+    "id:200007,phase:2,deny,status:403,msg:'SQL Injection detected - SELECT with condition',severity:2,t:none"
+
+#LFI
+SecRule ARGS "(?i:\.\./)" \
+    "id:300001,phase:2,deny,status:403,msg:'LFI detected - Path traversal',severity:2,t:none"
+SecRule ARGS "(?i:(\.\./)+etc/passwd)" \
+    "id:300002,phase:2,deny,status:403,msg:'LFI detected - Access to sensitive files (passwd)',severity:2,t:none"
+SecRule ARGS "(?i:(\.\./)+.*\.php)" \
+    "id:300003,phase:2,deny,status:403,msg:'LFI detected - Attempt to include PHP files',severity:2,t:none"
+SecRule ARGS "(?i:%00)" \
+    "id:300004,phase:2,deny,status:403,msg:'LFI detected - Null byte injection',severity:2,t:none"
+SecRule ARGS "(?i:(file|php|zip|data|expect):\/\/)" \
+    "id:300005,phase:2,deny,status:403,msg:'LFI detected - Protocol abuse',severity:2,t:none"
+SecRule ARGS "(?i:(readfile|include|require|fopen|file_get_contents)\()" \
+    "id:300006,phase:2,deny,status:403,msg:'LFI detected - Dangerous PHP function',severity:2,t:none"
+SecRule ARGS "(?i:(/var/log|/tmp|/session))" \
+    "id:300007,phase:2,deny,status:403,msg:'LFI detected - Access to log or session files',severity:2,t:none"
+
+#XSS
+SecRule ARGS "<script.*?>" "id:100001,phase:2,deny,status:403,msg:'XSS attack detected - script tag',severity:2,t:none"
+SecRule ARGS "(on\w+=)" "id:100002,phase:2,deny,status:403,msg:'XSS attack detected - event handler attributes',severity:2,t:none"
+SecRule ARGS "<img.*?src=.*?javascript:.*?>" "id:100003,phase:2,deny,status:403,msg:'XSS attack detected - JavaScript src',severity:2,t:none"
+SecRule ARGS "(eval\()" "id:100004,phase:2,deny,status:403,msg:'XSS attack detected - eval function',severity:2,t:none"
+SecRule ARGS "(alert|prompt|confirm)\s*\(" "id:100005,phase:2,deny,status:403,msg:'XSS attack detected - alert/prompt/confirm',severity:2,t:none"
+SecRule ARGS "<(iframe|object|embed|form|svg|link|style).*?>" "id:100006,phase:2,deny,status:403,msg:'XSS attack detected - disallowed HTML tag',severity:2,t:none"
+SecRule ARGS "document\.cookie" "id:100007,phase:2,deny,status:403,msg:'XSS attack detected - document.cookie access',severity:2,t:none"
+
+#RCE
+SecRule ARGS "(?i:(system|exec|shell_exec|passthru|popen|proc_open|eval|assert|base64_decode)\()" \
+    "id:400001,phase:2,deny,status:403,msg:'RCE detected - Dangerous PHP function',severity:2,t:none"
+SecRule ARGS "(?i:(\b(cat|ls|whoami|id|uname|pwd|echo|rm|touch|cp|mv)\b))" \
+    "id:400002,phase:2,deny,status:403,msg:'RCE detected - System commands',severity:2,t:none"
+SecRule ARGS "(;|\||&|`|\$\(.*\)|\$\{.*\})" \
+    "id:400003,phase:2,deny,status:403,msg:'RCE detected - Special characters for command injection',severity:2,t:none"
+SecRule ARGS "(?i:(/bin/bash|/bin/sh|/usr/bin/perl|/usr/bin/python|/usr/bin/php))" \
+    "id:400004,phase:2,deny,status:403,msg:'RCE detected - Direct execution of interpreters',severity:2,t:none"
+SecRule ARGS "(?i:(wget|curl|lwp-download))" \
+    "id:400005,phase:2,deny,status:403,msg:'RCE detected - Remote file download tools',severity:2,t:none"
+SecRule ARGS "(?i:eval\(base64_decode\(|eval\(unserialize\()" \
+    "id:400006,phase:2,deny,status:403,msg:'RCE detected - Dangerous eval with decoding',severity:2,t:none"
+
